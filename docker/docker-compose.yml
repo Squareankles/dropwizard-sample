@@ -1,0 +1,59 @@
+services:
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: customer
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: '%'
+    ports:
+        - 33060:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - AWS_DEFAULT_REGION=us-east-1
+      - EDGE_PORT=4566
+      - SERVICES=lambda,s3
+    ports:
+      - '4566-4583:4566-4583'
+    volumes:
+      - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
