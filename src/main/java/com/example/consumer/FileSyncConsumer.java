@@ -1,5 +1,6 @@
 package com.example.consumer;
 
+import com.example.core.service.FileProcessingService;
 import com.google.inject.Inject;
 import java.time.Duration;
 import java.util.Collections;
@@ -19,9 +20,13 @@ public class FileSyncConsumer extends Thread {
 
   private final Consumer<String, String> consumer;
 
+  private final FileProcessingService fileProcessingService;
+
   @Inject
-  public FileSyncConsumer(Consumer<String, String> consumer) {
+  public FileSyncConsumer(Consumer<String, String> consumer,
+      FileProcessingService fileProcessingService) {
     this.consumer = consumer;
+    this.fileProcessingService = fileProcessingService;
   }
 
   @PostStartup
@@ -45,13 +50,11 @@ public class FileSyncConsumer extends Thread {
           List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
 
           for (ConsumerRecord<String, String> record : partitionRecords) {
-            Thread.sleep(6000);
-            log.info(record.offset() + ": " + record.value());
+            this.fileProcessingService.process(record.value());
             consumer.commitAsync(
                 Collections.singletonMap(partition, new OffsetAndMetadata(record.offset() + 1)),
                 null);
           }
-
 
         }
       }

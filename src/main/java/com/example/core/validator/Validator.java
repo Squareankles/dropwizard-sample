@@ -2,8 +2,8 @@ package com.example.core.validator;
 
 import com.example.core.exception.ValidStatusException;
 
-public interface Validator<T> {
+public interface Validator<V> {
 
-  void validate(T value) throws ValidStatusException;
+  void validate(V value) throws ValidStatusException;
 
 }

@@ -9,6 +9,8 @@ public interface FileSyncClient {
 
   String upload(File file, UUID folderName, String fileName);
 
+  String download(String fileKey);
+
   String getUrl(String fileKey);
 
   void remove(String fileKey);

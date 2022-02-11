@@ -6,11 +6,20 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.example.consumer.FileSyncConsumer;
+import com.example.core.mapper.CustomerContactsMapper;
+import com.example.core.mapper.Mapper;
 import com.example.core.model.StatusValidationHolder;
 import com.example.core.validator.StatusValidator;
 import com.example.core.validator.Validator;
+import com.example.db.entity.Customer;
 import com.google.inject.TypeLiteral;
+import java.io.IOException;
 import java.util.Properties;
+import lombok.SneakyThrows;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -19,6 +28,7 @@ import ru.vyarus.dropwizard.guice.module.support.DropwizardAwareModule;
 
 public class ExampleModule extends DropwizardAwareModule<ExampleConfiguration> {
 
+  @SneakyThrows
   @Override
   protected void configure() {
 
@@ -29,9 +39,12 @@ public class ExampleModule extends DropwizardAwareModule<ExampleConfiguration> {
 
     bind(new TypeLiteral<Validator<StatusValidationHolder>>() {
     }).to(StatusValidator.class);
+    bind(new TypeLiteral<Mapper<String, Customer>>() {
+    }).to(CustomerContactsMapper.class);
     bindAWSS3Client();
     bindKafkaProducer();
     bindKafkaConsumer();
+    bindHBaseConnection();
   }
 
   private void bindAWSS3Client() {
@@ -52,7 +65,8 @@ public class ExampleModule extends DropwizardAwareModule<ExampleConfiguration> {
     props.put("acks", "all");
     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
     props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-    bind(new TypeLiteral<Producer<String, String>>() { }).toInstance(new KafkaProducer<>(props));
+    bind(new TypeLiteral<Producer<String, String>>() {
+    }).toInstance(new KafkaProducer<>(props));
   }
 
   private void bindKafkaConsumer() {
@@ -60,11 +74,31 @@ public class ExampleModule extends DropwizardAwareModule<ExampleConfiguration> {
     props.put("bootstrap.servers", "localhost:29092");
     props.setProperty("enable.auto.commit", "false");
     props.setProperty("group.id", "8");
-    props.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    props.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    props.setProperty("key.deserializer",
+        "org.apache.kafka.common.serialization.StringDeserializer");
+    props.setProperty("value.deserializer",
+        "org.apache.kafka.common.serialization.StringDeserializer");
     KafkaConsumer consumer = new KafkaConsumer<>(props);
-    bind(new TypeLiteral<Consumer<String, String>>() { }).toInstance(consumer);
+    bind(new TypeLiteral<Consumer<String, String>>() {
+    }).toInstance(consumer);
     bind(FileSyncConsumer.class).asEagerSingleton();
+  }
+
+  private void bindHBaseConnection() throws IOException {
+    Configuration hBaseConfig = HBaseConfiguration.create();
+
+    Connection connection = ConnectionFactory.createConnection(hBaseConfig);
+    bind(Connection.class).toInstance(connection);
+/*    Table table = connection.getTable(TableName.valueOf("customer"));
+    Put p = new Put(Bytes.toBytes("row1"));
+
+    p.addColumn(Bytes.toBytes("contact"), Bytes.toBytes("test"),Bytes.toBytes("test1"));
+    table.put(p);
+    Get g = new Get(Bytes.toBytes("row1"));
+    Result r = table.get(g);
+    byte[] valueBytes = r.getValue(Bytes.toBytes("contact"), Bytes.toBytes("test"));
+    String value = Bytes.toString(valueBytes);
+    r.toString();*/
   }
 
 }

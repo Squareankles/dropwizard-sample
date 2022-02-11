@@ -22,7 +22,7 @@ create table sync_operation_payload
     FOREIGN KEY (sync_operation_id) REFERENCES sync_operation (sync_operation_id)
 );
 
--- rollback drop table sync_payload
+-- rollback drop table sync_operation_payload
 
 -- changeset michael walsh:3
 create table sync_status

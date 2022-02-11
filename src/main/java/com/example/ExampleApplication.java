@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.cli.HBaseCommand;
 import com.example.core.exceptionmapper.HTTPStatusExceptionMapper;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
@@ -21,6 +22,8 @@ public class ExampleApplication extends Application<ExampleConfiguration> {
 
   @Override
   public void initialize(Bootstrap<ExampleConfiguration> bootstrap) {
+
+    bootstrap.addCommand(new HBaseCommand());
 
     bootstrap.addBundle(new MigrationsBundle<>() {
       @Override

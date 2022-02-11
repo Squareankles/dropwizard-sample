@@ -39,7 +39,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 18080:18080
 
   localstack:
     image: localstack/localstack:latest
@@ -52,8 +52,31 @@ services:
     volumes:
       - "${TEMPDIR:-/tmp/localstack}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./aws:/docker-entrypoint-initaws.d"
+
+  hbase:
+    image: dajobe/hbase:latest
+    # hbase-docker needs to be added to the /etc/hosts file of the local machine
+    # Can get around this by the linking app joining to the network
+    hostname: hbase-docker
+    ports:
+      - 9090:9090
+      - 8080:8080
+      - 16010:16010
+      - 16020:16020
+      - 16000:16000
+      - 16030:16030
+      - 9095:9095
+      - 2181:2181
+      - 8085:8085
+    networks:
+      hbase-net:
+        aliases:
+          - hbase-docker
 volumes:
   zookeeper_data:
     driver: local
   kafka_data:
     driver: local
+networks:
+  hbase-net:

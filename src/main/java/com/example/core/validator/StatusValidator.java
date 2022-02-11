@@ -8,7 +8,7 @@ public class StatusValidator implements Validator<StatusValidationHolder> {
   @Override
   public void validate(StatusValidationHolder value) {
 
-    if(value.getCurrent() != value.getExpected()) {
+    if (value.getCurrent() != value.getExpected()) {
       throw new ValidStatusException();
     }
   }

@@ -61,7 +61,7 @@ public class FileSyncServiceImpl implements FileSyncService {
       fileKey = this.fileSyncClient.upload(file, uploadKey, fileName);
       String fileLocation = this.fileSyncClient.getUrl(fileKey);
       // Save the upload record
-      this.fileSyncDao.create(new FileSync(uploadKey, operationId, fileLocation, now));
+      this.fileSyncDao.create(new FileSync(uploadKey, operationId, fileLocation, fileKey, now));
 
       // Send to kafka
       this.fileSyncProducer.send(operationId);

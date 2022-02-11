@@ -15,6 +15,8 @@ public class FileSync {
 
   private final String location;
 
+  private final String fileKey;
+
   private final ZonedDateTime created;
 
 }
