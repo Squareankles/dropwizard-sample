@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.Length;
 @Getter
 public class SyncOperationRequest {
 
-  @Length(min = 5, max = 35)
+  @Length(min = 5, max = 36)
   @JsonProperty
   @NotEmpty
   private String customerId;

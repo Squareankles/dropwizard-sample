@@ -1,0 +1,60 @@
+[{
+  "name": {
+    "firstName": "John",
+    "lastName": "Peters"
+  },
+  "address": {
+    "line1": "56 sherlock walk",
+    "line2": "Gracedieu",
+    "city": "Galway"
+  },
+  "contact": {
+    "landLineNumber": "05656432656",
+    "mobile": "08765165122"
+  }
+},
+  {
+    "name": {
+      "firstName": "Paul",
+      "lastName": "Parker"
+    },
+    "address": {
+      "line1": "25 sherlock walk",
+      "line2": "Gracedieu",
+      "city": "Galway"
+    },
+    "contact": {
+      "landLineNumber": "05656432656",
+      "mobile": "08765165122"
+    }
+  },
+  {
+    "name": {
+      "firstName": "Parker",
+      "lastName": "Paul"
+    },
+    "address": {
+      "line1": "58 sherlock walk",
+      "line2": "Gracedieu",
+      "city": "Galway"
+    },
+    "contact": {
+      "landLineNumber": "05656432656",
+      "mobile": "08765165122"
+    }
+  },
+  {
+    "name": {
+      "firstName": "Paul",
+      "lastName": "Peters"
+    },
+    "address": {
+      "line1": "78 sherlock walk",
+      "line2": "Gracedieu",
+      "city": "Galway"
+    },
+    "contact": {
+      "landLineNumber": "05656432656",
+      "mobile": "08765165122"
+    }
+  }]

@@ -12,12 +12,15 @@ import com.example.core.model.StatusValidationHolder;
 import com.example.core.validator.Validator;
 import com.example.db.dao.CustomerDao;
 import com.example.db.dao.FileSyncDao;
+import com.example.db.dao.SyncOperationDao;
 import com.example.db.dao.SyncOperationStatusDao;
 import com.example.db.entity.Customer;
+import com.example.db.entity.DataSyncOperation;
 import com.example.db.entity.FileSync;
 import com.example.db.entity.OperationStatus;
 import com.google.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,20 +37,24 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 
   private final Validator<StatusValidationHolder> statusValidator;
 
-  private final Mapper<String, Customer> customerMapper;
+  private final Mapper<String, List<Customer>> customerMapper;
+
+  private final SyncOperationDao syncOperationDao;
 
   @Inject
   public FileProcessingServiceImpl(FileSyncDao fileSyncDao,
       SyncOperationStatusDao operationStatusDao, FileSyncClient fileSyncClient,
       CustomerDao customerDao,
       Validator<StatusValidationHolder> statusValidator,
-      Mapper<String, Customer> customerMapper) {
+      Mapper<String, List<Customer>> customerMapper,
+      com.example.db.dao.SyncOperationDao syncOperationDao) {
     this.fileSyncDao = fileSyncDao;
     this.operationStatusDao = operationStatusDao;
     this.fileSyncClient = fileSyncClient;
     this.customerDao = customerDao;
     this.statusValidator = statusValidator;
     this.customerMapper = customerMapper;
+    this.syncOperationDao = syncOperationDao;
   }
 
   @Override
@@ -71,11 +78,13 @@ public class FileProcessingServiceImpl implements FileProcessingService {
       String fileContent = this.fileSyncClient.download(fileSync.getFileKey());
 
       // Parse the file
-      this.customerMapper.map(fileContent);
+      List<Customer> customers = this.customerMapper.map(fileContent);
 
       // Save the details to hbase
+      DataSyncOperation dataSyncOperation = this.syncOperationDao.get(id);
 
-      // Update the status In reality would need better exception handling for adding to a queue when something fails
+      this.customerDao.create(customers, dataSyncOperation.customerId);
+      // Update the status in reality would need better exception handling for adding to a queue when something fails
       this.operationStatusDao
           .create(
               new OperationStatus(UUID.randomUUID(), UUID.fromString(id), COMPLETED, ZonedDateTime

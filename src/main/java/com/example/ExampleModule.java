@@ -5,8 +5,10 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.example.api.CustomerResponse;
 import com.example.consumer.FileSyncConsumer;
 import com.example.core.mapper.CustomerContactsMapper;
+import com.example.core.mapper.CustomerListMapper;
 import com.example.core.mapper.Mapper;
 import com.example.core.model.StatusValidationHolder;
 import com.example.core.validator.StatusValidator;
@@ -14,6 +16,7 @@ import com.example.core.validator.Validator;
 import com.example.db.entity.Customer;
 import com.google.inject.TypeLiteral;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import lombok.SneakyThrows;
 import org.apache.hadoop.conf.Configuration;
@@ -39,8 +42,10 @@ public class ExampleModule extends DropwizardAwareModule<ExampleConfiguration> {
 
     bind(new TypeLiteral<Validator<StatusValidationHolder>>() {
     }).to(StatusValidator.class);
-    bind(new TypeLiteral<Mapper<String, Customer>>() {
+    bind(new TypeLiteral<Mapper<String, List<Customer>>>() {
     }).to(CustomerContactsMapper.class);
+    bind(new TypeLiteral<Mapper<List<Customer>, CustomerResponse>>() {
+    }).to(CustomerListMapper.class);
     bindAWSS3Client();
     bindKafkaProducer();
     bindKafkaConsumer();
@@ -89,16 +94,6 @@ public class ExampleModule extends DropwizardAwareModule<ExampleConfiguration> {
 
     Connection connection = ConnectionFactory.createConnection(hBaseConfig);
     bind(Connection.class).toInstance(connection);
-/*    Table table = connection.getTable(TableName.valueOf("customer"));
-    Put p = new Put(Bytes.toBytes("row1"));
-
-    p.addColumn(Bytes.toBytes("contact"), Bytes.toBytes("test"),Bytes.toBytes("test1"));
-    table.put(p);
-    Get g = new Get(Bytes.toBytes("row1"));
-    Result r = table.get(g);
-    byte[] valueBytes = r.getValue(Bytes.toBytes("contact"), Bytes.toBytes("test"));
-    String value = Bytes.toString(valueBytes);
-    r.toString();*/
   }
 
 }

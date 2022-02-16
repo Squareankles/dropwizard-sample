@@ -26,6 +26,8 @@ public class HBaseCommand extends Command {
 
   private static final String CONTACT_FAMILY = "contact";
 
+  private static final String NAME_FAMILY = "name";
+
   public HBaseCommand() {
     super("hbase", "build tables");
   }
@@ -45,15 +47,20 @@ public class HBaseCommand extends Command {
 
       if (!admin.tableExists(TableName.valueOf(CUSTOMER_TABLE))) {
         log.info("Creating customer table");
+
         ColumnFamilyDescriptor contactColumnFamily = ColumnFamilyDescriptorBuilder
             .newBuilder(Bytes.toBytes(CONTACT_FAMILY)).build();
         ColumnFamilyDescriptor addressColumnFamily = ColumnFamilyDescriptorBuilder
             .newBuilder(Bytes.toBytes(ADDRESS_FAMILY)).build();
+        ColumnFamilyDescriptor nameColumnFamily = ColumnFamilyDescriptorBuilder
+            .newBuilder(Bytes.toBytes(NAME_FAMILY)).build();
+
         TableDescriptor tableDescriptor = TableDescriptorBuilder
             .newBuilder(TableName.valueOf(CUSTOMER_TABLE)).setColumnFamily(contactColumnFamily)
-            .setColumnFamily(addressColumnFamily).build();
+            .setColumnFamily(addressColumnFamily).setColumnFamily(nameColumnFamily).build();
 
         admin.createTable(tableDescriptor);
+
         log.info("Customer table created");
       } else {
         log.info("Customer table already exists");

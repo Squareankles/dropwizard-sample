@@ -59,6 +59,7 @@ public class FileSyncConsumer extends Thread {
         }
       }
     } finally {
+
       consumer.close();
     }
   }
