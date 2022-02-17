@@ -10,7 +10,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-@Path("/customers")
+@Path("/v1/customers")
 @Produces(APPLICATION_JSON)
 public class CustomerResource {
 

@@ -13,7 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-@Path("/syncoperation")
+@Path("/v1/syncoperation")
 @Produces(APPLICATION_JSON)
 public class SyncOperationResource {
 

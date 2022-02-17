@@ -20,7 +20,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 @Slf4j
-@Path("/filesync")
+@Path("/v1/filesync")
 public class FileSyncResource {
 
   private final FileSyncService fileSyncService;
@@ -39,8 +39,6 @@ public class FileSyncResource {
       @FormDataParam("file") File uploadedFile,
       @FormDataParam("file") FormDataContentDisposition fileMetaData)
       throws ExecutionException, InterruptedException {
-    log.info("got here");
-    fileMetaData.getFileName();
     this.fileSyncService.upload(operationId, uploadedFile, fileMetaData.getFileName());
     return Response.status(Status.CREATED).build();
   }
