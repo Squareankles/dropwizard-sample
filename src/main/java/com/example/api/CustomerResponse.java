@@ -1,5 +1,6 @@
 package com.example.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -48,6 +49,11 @@ public class CustomerResponse {
       private final String landLine;
 
       private final String mobile;
+
+      @JsonIgnore
+      public String getLandLine() {
+        return landLine;
+      }
     }
   }
 
